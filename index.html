@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="p5.js"></script>
+    <script src="p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="sketch-content">
+        <script src="src/consts.js"></script>
+        <script src="src/inputs.js"></script>
+        <script src="src/physics.js"></script>
+        <script src="src/sketch.js"></script>
+      </div>
+    </div>
+    <div class = "full">
+      <div class="buttons">
+        <input type="number" id="numberInputX">
+        <button onclick="processXInput()">Zmien</button>
+        <span id="descriptionX">Pozycja X routera</span>
+      </div>
+      <div class="buttons">
+        <input type="number" id="numberInputY">
+        <button onclick="processYInput()">Zmien</button>
+        <span id="descriptionY">Pozucja Y routera</span>
+      </div>
+      <div class="buttons">
+        <input type="number" id="clean">
+        <button onclick="clean()">Zmien</button>
+        <span id="clean">Wyczysc</span>
+      </div>
+      <style>.full{
+        position:absolute;
+        right:0
+      }</style>
+    </div>
+  </body>
+</html>
