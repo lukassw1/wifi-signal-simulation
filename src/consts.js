@@ -10,6 +10,9 @@ let img;
 let u = new Array(L); // u(t)
 let u_next = new Array(L); // u(t+dt)
 let u_prev = new Array(L); // u(t-dt)
+let walls = new Array(L); // walls
+
+
 
 function clean(){
     for (let i = 0; i < L; ++i) {
@@ -17,6 +20,18 @@ function clean(){
         u_next[i] = new Array(L).fill(0);
         u_prev[i] = new Array(L).fill(0);
     }
+}
+
+
+function make_walls(){
+    for (let i = 0; i < L; ++i) {
+        walls[i] = new Array(L).fill(1);
+    }
+
+    for (let i = 50; i < 151; ++i){
+        walls[i][50] = 0.6
+    }
+
 }
 
 let number_x = 100;

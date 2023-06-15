@@ -6,6 +6,7 @@ function step() {
         u_next[x][y] += u[x][y - 1] - 2 * u[x][y] + u[x][y + 1];
         u_next[x][y] *= c;
         u_next[x][y] += -u_prev[x][y] + 2 * u[x][y];
+        u_next[x][y] *= walls[x][y]
       }
     
     // edges
