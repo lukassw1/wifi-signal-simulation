@@ -27,9 +27,22 @@
         <span id="descriptionY">Pozucja Y routera</span>
       </div>
       <div class="buttons">
-        <input type="number" id="clean">
-        <button onclick="clean()">Zmien</button>
-        <span id="clean">Wyczysc</span>
+        <button onclick="clean()">Wyczysc</button>
+      </div>
+      <div class="buttons">
+        <input type="number" id="numberInputFrequency">
+        <button onclick="processFrequency()">Zmien</button>
+        <span id="descriptionFrequency">Wartość częstotliwości (domyślnie 2.4)</span>
+      </div>
+      <div class="buttons">
+        <input type="number" id="numberInputAmplitude">
+        <button onclick="processAmplitude()">Zmien</button>
+        <span id="descriptionAmplitude">Wartość amplitudy (domyślnie 127)</span>
+      </div>
+      <div class="buttons">
+        <input type="number" id="numberInputOmega">
+        <button onclick="processOmega()">Zmien</button>
+        <span id="descriptionOmega">Wartość omega (domyślnie 6)</span>
       </div>
       <style>.full{
         position:absolute;

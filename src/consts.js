@@ -5,6 +5,9 @@ const dt = 1 / 60;
 const dx = 1 / L;
 const pixel_size = 2
 const c = v * v * dt * dt / dx / dx;
+let amplitude = 127;
+let omega = 6;
+let frequency = 2.4;
 let t = 0;
 let img;
 let u = new Array(L); // u(t)

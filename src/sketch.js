@@ -11,12 +11,9 @@ function setup() {
 }
 
 function draw() {
-  let A = 127;
-  let omega = 6;
-  let frequency = 2.4
   {
     // start point
-    u[number_x][number_y] = A * sin(frequency * omega * t);
+    u[number_x][number_y] = amplitude * sin(frequency * omega * t);
     // update values
     step();
   }
