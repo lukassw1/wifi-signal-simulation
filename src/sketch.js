@@ -21,7 +21,7 @@ function draw() {
   img.loadPixels();
   for (x = 0; x < L; ++x){
     for (y = 0; y < L; ++y) {
-      if (walls[x][y] != 1){
+      if (walls[x][y] <= 0.99){
         img.set(x, y, color(0, 0, 0));
       }
       else{

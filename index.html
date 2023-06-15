@@ -17,6 +17,10 @@
     </div>
     <div class = "full">
       <div class="buttons">
+        <input type="file" id="fileInput" onchange="loadImageFromInput(event)">
+        <span id="descriptionX">Ustaw obraz planszy</span>
+      </div>
+      <div class="buttons">
         <input type="number" id="numberInputX">
         <button onclick="processXInput()">Zmien</button>
         <span id="descriptionX">Pozycja X routera</span>
