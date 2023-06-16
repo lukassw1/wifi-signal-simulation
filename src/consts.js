@@ -17,7 +17,11 @@ let walls = new Array(L); // walls
 let file;
 let block = false;
 let dragging = true;
-
+let r_1_x = 100;
+let r_1_y = 100;
+let r_2_enabled = false;
+let r_2_x = 50;
+let r_2_y = 50;
 
 function clean() {
   for (let i = 0; i < L; ++i) {
@@ -68,6 +72,3 @@ function make_walls_from_img(bg_img) {
     }
   }
 }
-
-let number_x = 100;
-let number_y = 100;

@@ -11,11 +11,11 @@ function setup() {
 }
 
 function draw() {
-  over = ((Math.abs(number_x - mouseX / pixel_size) <= 10 && Math.abs(number_y - mouseY / pixel_size) <= 10));
+  over = ((Math.abs(r_1_x - mouseX / pixel_size) <= 10 && Math.abs(r_1_y - mouseY / pixel_size) <= 10));
 
   {
     // start point
-    u[number_x][number_y] = amplitude * sin(frequency * omega * t);
+    u[r_1_x][r_1_y] = amplitude * sin(frequency * omega * t);
     // update values
     step();
   }

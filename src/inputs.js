@@ -1,9 +1,9 @@
 function processXInput() {
-  number_x = parseInt(document.getElementById('numberInputX').value);
+  r_1_x = parseInt(document.getElementById('numberInputX').value);
 }
   
 function processYInput() {
-  number_y = parseInt(document.getElementById('numberInputY').value);
+  r_1_y = parseInt(document.getElementById('numberInputY').value);
 }
 
 function processFrequency() {
@@ -39,8 +39,8 @@ function mousePressed() {
 
 function mouseDragged() {
   if (dragging) {
-    number_x = Math.max(Math.min(Math.round(mouseX / pixel_size), L), 0);
-    number_y = Math.max(Math.min(Math.round(mouseY / pixel_size), L), 0);
+    r_1_x = Math.max(Math.min(Math.round(mouseX / pixel_size), L), 0);
+    r_1_y = Math.max(Math.min(Math.round(mouseY / pixel_size), L), 0);
   }
 }
 
