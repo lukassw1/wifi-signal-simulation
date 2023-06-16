@@ -10,7 +10,7 @@ function processFrequency() {
   frequency = parseInt(document.getElementById('numberInputFrequency').value);
 }
 
-function processomega() {
+function processAmplitude() {
   amplitude = parseInt(document.getElementById('numberInputAmplitude').value);
 }
 

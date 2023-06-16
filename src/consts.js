@@ -34,22 +34,37 @@ function make_walls() {
   }
 
   for (let i = 50; i < 151; ++i){
-    walls[i][50] = 0.9
+    walls[i][50] = 0.7
   }
 
 }
 
 function make_walls_from_img(bg_img) {
   bg_img.loadPixels();
-  const d = pixelDensity();
+  
 
-  for (let i = 0; i < L; ++i) {
-    for (let j = 0; j < L; ++j) {
-      const idx = 4 * d * (j * d * L + i);
-      const [r, g, b] = [bg_img.pixels[idx], bg_img.pixels[idx + 1], bg_img.pixels[idx + 2]];
-      const luminance = ((0.2126 * r + 0.7152 * g + 0.0722 * b) / 255);
-
-      walls[i][j] = luminance;
+  for (let j = 0; j < L; ++j) {
+    for (let i = 0; i < L; ++i) {
+      let idx = 4  * (j +  L * i);
+      let r = bg_img.pixels[idx];
+      let g = bg_img.pixels[idx + 1];
+      let b = bg_img.pixels[idx + 2];
+      let luminance = ((0.2126 * r + 0.7152 * g + 0.0722 * b) / 255);
+      
+      if(r != 255){
+        if(r == 0){
+            walls[i][j] = 0.7;
+        }
+        if(r == 195){
+            walls[i][j] = 0.98;
+        }
+        if(r == 127){
+            walls[i][j] = 0.9;
+        }
+      }
+      else{
+        walls[i][j] = 1;
+      }
     }
   }
 }

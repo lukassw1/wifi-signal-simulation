@@ -23,8 +23,16 @@ function draw() {
   img.loadPixels();
   for (x = 0; x < L; ++x) {
     for (y = 0; y < L; ++y) {
-      if (walls[x][y] <= 0.99){
-        img.set(x, y, color(0, 0, 0));
+      if (walls[x][y] != 1){
+        if (walls[x][y] == 0.98){
+          img.set(x, y, color(195, 195, 195));
+        }
+        if (walls[x][y] == 0.9){
+          img.set(x, y, color(127, 127, 127));
+        }
+        if (walls[x][y] == 0.7){
+          img.set(x, y, color(0, 0, 0));
+        }
       }
       else {
         let c = u[x][y];
