@@ -211,6 +211,16 @@ const sketch: Sketch = (p5) => {
 
 		img.updatePixels();
 		p5.image(img, 0, 0, p5.width, p5.height);
+
+		if (over) {
+			p5.strokeWeight(16);
+			p5.stroke(p5.color(0, 0, 0));
+			p5.point(r_1_x * pixel_size + 1, r_1_y * pixel_size + 1);
+		}
+
+		p5.strokeWeight(8);
+		p5.stroke(p5.color(0, 0, 200));
+		p5.point(r_1_x * pixel_size + 1, r_1_y * pixel_size + 1);
 	}
 };
 
