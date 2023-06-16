@@ -11,6 +11,8 @@ function setup() {
 }
 
 function draw() {
+  over = ((Math.abs(number_x - mouseX / pixel_size) <= 10 && Math.abs(number_y - mouseY / pixel_size) <= 10));
+
   {
     // start point
     u[number_x][number_y] = amplitude * sin(frequency * omega * t);
@@ -19,12 +21,12 @@ function draw() {
   }
   // update image
   img.loadPixels();
-  for (x = 0; x < L; ++x){
+  for (x = 0; x < L; ++x) {
     for (y = 0; y < L; ++y) {
       if (walls[x][y] <= 0.99){
         img.set(x, y, color(0, 0, 0));
       }
-      else{
+      else {
         let c = u[x][y];
         c = c * 5
         if (c > 0){
@@ -34,9 +36,9 @@ function draw() {
           img.set(x, y, color(255+c, 255, 255+c));}
       }
     }
-    }
+  }
+
   img.updatePixels();
   image(img, 0, 0, width, height);
-  
-  }
+}
 
