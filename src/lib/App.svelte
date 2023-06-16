@@ -1,6 +1,6 @@
 <script lang="ts">
 import P5 from 'p5-svelte';
-import type { Image } from 'p5';
+import type { Image, Renderer } from 'p5';
 import type { Sketch } from 'p5-svelte';
 
 const H = 100; 
@@ -20,11 +20,15 @@ let u = new Array(L); // u(t)
 let u_next = new Array(L); // u(t+dt)
 let u_prev = new Array(L); // u(t-dt)
 let walls = new Array(L); // walls
-let over = false;
+let currentRouterIndex: number | null = null;
 let dragging = true;
 
-let r_1_x = 100;
-let r_1_y = 100;
+interface RouterState {
+	x: number;
+	y: number;
+}
+
+let routers: RouterState[] = [{x: 100, y: 100}];
 
 let files: FileList;
 
@@ -34,18 +38,6 @@ let imageLoader: LoadImage | null = null;
 
 const onFileChange = () => {
 	imageLoader?.(URL.createObjectURL(files[0]));
-}
-
-let selectedX = r_1_x;
-
-const processXInput = () => {
-	r_1_x = selectedX;
-}
-
-let selectedY = r_1_y;
-
-const processYInput = () => {
-	r_1_x = selectedY;
 }
 
 type Cleaner = () => void;
@@ -69,6 +61,8 @@ const processAmplitude = () => {
 }
 
 const sketch: Sketch = (p5) => {
+	let canvas: Renderer | null = null;
+	
 	const step = () => {
 		// moving by dt
 		for (let x = 1; x < L - 1; ++x) {
@@ -150,16 +144,42 @@ const sketch: Sketch = (p5) => {
 		});
 	}
 
+	const mouseInCanvas = (mouseX: number, mouseY: number) => {
+		let canvasMouseX = mouseX / pixel_size;
+		let canvasMouseY = mouseY / pixel_size;
+		
+		return canvasMouseX > 0 && canvasMouseX < L && canvasMouseY > 0 && canvasMouseY < L;
+	}
+
 	p5.mousePressed = () => {
-		if (over) {
-			dragging = true;
+		if (currentRouterIndex !== null) {
+			if (p5.mouseButton == p5.LEFT) {
+				dragging = true;
+			} else if (p5.mouseButton == p5.RIGHT) {
+				try {
+					// Disable context menu - this might be blocked in some browsers
+					canvas?.elt.addEventListener("contextmenu", (e: MouseEvent) => e.preventDefault());
+					setTimeout(() => {
+						canvas?.elt.addEventListener("contextmenu", () => {});
+					}, 100);
+				} finally {
+					// Remove router from the list
+					routers.forEach((_, routerIndex) => {
+						if (routerIndex === currentRouterIndex) {
+							routers.splice(routerIndex, 1);
+						}
+					});
+				}
+			}
+		} else if (mouseInCanvas(p5.mouseX, p5.mouseY)) {
+			routers.push({x: p5.round(p5.mouseX / pixel_size), y: p5.round(p5.mouseY / pixel_size)});
 		}
 	}
 
 	p5.mouseDragged = () => {
-		if (dragging) {
-			r_1_x = Math.max(Math.min(Math.round(p5.mouseX / pixel_size), L), 0);
-			r_1_y = Math.max(Math.min(Math.round(p5.mouseY / pixel_size), L), 0);
+		if (dragging && mouseInCanvas(p5.mouseX, p5.mouseY)) {
+			routers[currentRouterIndex!].x = p5.max(p5.min(p5.round(p5.mouseX / pixel_size), L), 0);
+			routers[currentRouterIndex!].y = p5.max(p5.min(p5.round(p5.mouseY / pixel_size), L), 0);
 		}
 	}
 
@@ -168,23 +188,37 @@ const sketch: Sketch = (p5) => {
 	}
 
 	p5.setup = () => {
-		p5.createCanvas(L * pixel_size , L * pixel_size);
+		canvas = p5.createCanvas(L * pixel_size , L * pixel_size);
 		img = p5.createImage(L, L);
+
 		clean();
 		makeWalls();
+
 		imageLoader = onLoadImage;
 		cleaner = clean;
 	}
 
 	p5.draw = () => {
-		over = ((Math.abs(r_1_x - p5.mouseX / pixel_size) <= 5 && Math.abs(r_1_y - p5.mouseY / pixel_size) <= 5));
+		// Distance to the closest router
+		let minDistance = Infinity;
 
-		{
-			// start point
-			u[r_1_x][r_1_y] = amplitude * p5.sin(frequency * omega * t);
-			// update values
-			step();
+		routers.forEach((routerState, routerIndex) => {
+			let routerDistance = p5.dist(routerState.x, routerState.y, p5.mouseX / pixel_size, p5.mouseY / pixel_size);
+
+			if (minDistance > routerDistance) {
+				minDistance = routerDistance;
+				currentRouterIndex = routerIndex;
+			}
+
+			u[routerState.x][routerState.y] = amplitude * p5.sin(frequency * omega * t);
+		});
+
+		if (minDistance > 5) {
+			currentRouterIndex = null;
 		}
+		
+		// update values
+		step();
 
 		if (img == null) {
 			return;
@@ -212,15 +246,17 @@ const sketch: Sketch = (p5) => {
 		img.updatePixels();
 		p5.image(img, 0, 0, p5.width, p5.height);
 
-		if (over) {
+		if (currentRouterIndex !== null) {
 			p5.strokeWeight(16);
 			p5.stroke(p5.color(0, 0, 0));
-			p5.point(r_1_x * pixel_size + 1, r_1_y * pixel_size + 1);
+			p5.point(routers[currentRouterIndex].x * pixel_size + 1, routers[currentRouterIndex].y * pixel_size + 1);
 		}
 
-		p5.strokeWeight(8);
-		p5.stroke(p5.color(0, 0, 200));
-		p5.point(r_1_x * pixel_size + 1, r_1_y * pixel_size + 1);
+		routers.forEach((routerState) => {
+			p5.strokeWeight(8);
+			p5.stroke(p5.color(0, 0, 200));
+			p5.point(routerState.x * pixel_size + 1, routerState.y * pixel_size + 1);
+		});
 	}
 };
 
@@ -239,22 +275,6 @@ const sketch: Sketch = (p5) => {
 <label class="buttons">
 	Ustaw obraz planszy
 	<input type="file" bind:files on:change={onFileChange} accept="image/png, image/jpeg" />
-</label>
-
-<br class="buttons">
-
-<label class="buttons">
-	Pozycja X routera
-	<input bind:value={selectedX} type="number">
-	<button on:click={processXInput}>Zmień</button>
-</label>
-
-<br class="buttons">
-
-<label>
-	Pozycja Y routera
-	<input bind:value={selectedY} type="number">
-	<button on:click={processYInput}>Zmień</button>
 </label>
 
 <br class="buttons">
