@@ -23,8 +23,8 @@ let walls = new Array(L); // walls
 let over = false;
 let dragging = true;
 
-let number_x = 100;
-let number_y = 100;
+let r_1_x = 100;
+let r_1_y = 100;
 
 let files: FileList;
 
@@ -33,20 +33,19 @@ type LoadImage = (source: string) => void;
 let imageLoader: LoadImage | null = null;
 
 const onFileChange = () => {
-	console.log("files ", files);
 	imageLoader?.(URL.createObjectURL(files[0]));
 }
 
-let selectedX = number_x;
+let selectedX = r_1_x;
 
 const processXInput = () => {
-	number_x = selectedX;
+	r_1_x = selectedX;
 }
 
-let selectedY = number_y;
+let selectedY = r_1_y;
 
 const processYInput = () => {
-	number_y = selectedY;
+	r_1_x = selectedY;
 }
 
 type Cleaner = () => void;
@@ -63,10 +62,10 @@ const processFrequency = () => {
 	frequency = selectedFrequency;
 }
 
-let selectedOmega = omega;
+let selectedAmplitude = amplitude;
 
-const processOmega = () => {
-	omega = selectedOmega;
+const processAmplitude = () => {
+	amplitude = selectedAmplitude;
 }
 
 const sketch: Sketch = (p5) => {
@@ -112,7 +111,7 @@ const sketch: Sketch = (p5) => {
 		}
 
 		for (let i = 50; i < 151; ++i){
-			walls[i][50] = 0.9
+			walls[i][50] = 0.7
 		}
 	}
 
@@ -121,13 +120,19 @@ const sketch: Sketch = (p5) => {
 
 		const d = p5.pixelDensity();
 
-		for (let i = 0; i < L; ++i) {
-			for (let j = 0; j < L; ++j) {
-			const idx = 4 * d * (j * d * L + i);
-			const [r, g, b] = [bgImg.pixels[idx], bgImg.pixels[idx + 1], bgImg.pixels[idx + 2]];
-			const luminance = ((0.2126 * r + 0.7152 * g + 0.0722 * b) / 255);
+		for (let x = 0; x < L; ++x) {
+			for (let y = 0; y < L; ++y) {
+				let idx = 4  * d * (x +  L * y * d);
+				let r = bgImg.pixels[idx];
+				let g = bgImg.pixels[idx + 1];
+				let b = bgImg.pixels[idx + 2];
+				let luminance = ((0.2126 * r + 0.7152 * g + 0.0722 * b) / 255);
 
-			walls[i][j] = luminance;
+				if (luminance > 0.99) {
+					walls[x][y] = 1;
+				} else {
+					walls[x][y] = luminance;
+				}
 			}
 		}
 	}
@@ -153,8 +158,8 @@ const sketch: Sketch = (p5) => {
 
 	p5.mouseDragged = () => {
 		if (dragging) {
-			number_x = Math.max(Math.min(Math.round(p5.mouseX / pixel_size), L), 0);
-			number_y = Math.max(Math.min(Math.round(p5.mouseY / pixel_size), L), 0);
+			r_1_x = Math.max(Math.min(Math.round(p5.mouseX / pixel_size), L), 0);
+			r_1_y = Math.max(Math.min(Math.round(p5.mouseY / pixel_size), L), 0);
 		}
 	}
 
@@ -172,36 +177,40 @@ const sketch: Sketch = (p5) => {
 	}
 
 	p5.draw = () => {
-		over = ((Math.abs(number_x - p5.mouseX / pixel_size) <= 10 && Math.abs(number_y - p5.mouseY / pixel_size) <= 10));
+		over = ((Math.abs(r_1_x - p5.mouseX / pixel_size) <= 5 && Math.abs(r_1_y - p5.mouseY / pixel_size) <= 5));
 
 		{
 			// start point
-			u[number_x][number_y] = amplitude * p5.sin(frequency * omega * t);
+			u[r_1_x][r_1_y] = amplitude * p5.sin(frequency * omega * t);
 			// update values
 			step();
 		}
 
+		if (img == null) {
+			return;
+		}
+
 		// update image
-		img!.loadPixels();
+		img.loadPixels();
 
 		for (let x = 0; x < L; ++x) {
 			for (let y = 0; y < L; ++y) {
 				if (walls[x][y] <= 0.99) {
-					img!.set(x, y, p5.color(0, 0, 0));
+					img.set(x, y, p5.color(p5.floor(walls[x][y] * 255)));
 				} else {
 					let c = u[x][y] * 5;
 
 					if (c > 0) {
-						img!.set(x, y, p5.color(255, 255-c, 255-c));
+						img.set(x, y, p5.color(255, 255-c, 255-c));
 					} else {
-						img!.set(x, y, p5.color(255+c, 255, 255+c));
+						img.set(x, y, p5.color(255+c, 255, 255+c));
 					}
 				}
 			}
 		}
 
-		img!.updatePixels();
-		p5.image(img!, 0, 0, p5.width, p5.height);
+		img.updatePixels();
+		p5.image(img, 0, 0, p5.width, p5.height);
 	}
 };
 
@@ -254,6 +263,6 @@ const sketch: Sketch = (p5) => {
 
 <label>
 	Wartość omega (domyślnie 6
-	<input bind:value={selectedOmega} type="number">
-	<button on:click={processOmega}>Zmień</button>
+	<input bind:value={selectedAmplitude} type="number">
+	<button on:click={processAmplitude}>Zmień</button>
 </label>
