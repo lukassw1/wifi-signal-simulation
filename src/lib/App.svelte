@@ -11,7 +11,7 @@ const dt = 1 / 60;
 const dx = 1 / L;
 const pixelSize = 2
 const c = v * v * dt * dt / dx / dx;
-const defaultImg = "basic-apartment_1_f_w.png";
+const defaultImg = "basic-apartment_1_f_w_g.png";
 const defaultAmplitude = 127;
 const defaultOmega = 6;
 const defaultFrequency = 2.4;
@@ -432,7 +432,10 @@ const sketch: Sketch = (p5) => {
 				- W panelu po lewej stronie istnieje możliwość wyczyszczenia obrazu z istniejących na nim fal oraz możliwość zatrzymania symulacji, <br>
 				- Istnieje możliwość wczytania własnego pliku .png o wymiarach 201x201, <br>
 				- Istnieje możliwość zmiany współczynnika tłumienia w ośrodku, <br>
-				- Współczynnik tłumienia na obrazie jest wymierzany według składowej luminacji w modelu YCbCr, <br>
+				- Współczynnik tłumienia na obrazie jest wymierzany według składowej luminacji w modelu YCbCr,
+				więc kolor biały nie powoduje tłumienia, a kolor czarny powoduje całkowity zanik sygnału.
+				Współczynnik tłumienia = luminacja/255. W przypadku gdy przeszkoda ma więcej niż 1 pixel grubości (Współczynnik tłumienia)**ilość pixeli,  <br>
+				- na domyślnie wgranym obrazie obraz obrazach przykładowych znajduję się wiele odcieni szarośći imitujących różne przeszkody posiadające rózne współczynniki tłumienia,  <br>
 			</p>
 		</div>
 	</div>
