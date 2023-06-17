@@ -2,6 +2,7 @@
 import P5 from 'p5-svelte';
 import type { Image, Renderer } from 'p5';
 import type { Sketch } from 'p5-svelte';
+import Item from './Item.svelte';
 
 const H = 100; 
 const L = 2 * H + 1; // number of nodes
@@ -11,15 +12,9 @@ const dx = 1 / L;
 const pixelSize = 2
 const c = v * v * dt * dt / dx / dx;
 const defaultImg = "basic-apartment_1_f_w.png";
-
-let amplitude = 127;
-let omega = 6;
-let frequency = 2.4;
-let damping = 0.1;
-let t = 0;
-
-let img: Image | null = null;
-let walls = new Array(L);
+const defaultAmplitude = 127;
+const defaultOmega = 6;
+const defaultFrequency = 2.4;
 
 // Absorption layer thicknesses (outer layer)
 const a_r = 50; // right
@@ -29,6 +24,13 @@ const a_b = 50; // bottom
 const a_h = a_r + a_l; // horizontal combined
 const a_v = a_t + a_b; // vertical combined
 const a_s = a_h + a_v; // sum
+const absorption = 0.4;
+
+let damping = 0.1;
+let t = 0;
+
+let img: Image | null = null;
+let walls = new Array(L);
 
 
 let u = new Array(L + a_s); // u(t)
@@ -42,9 +44,23 @@ let stop = false;
 interface RouterState {
 	x: number;
 	y: number;
+	amplitude: number;
+	omega: number;
+	frequency: number;
+
+	selectedFrequency: number;
+	selectedAmplitude : number;
 }
 
-let routers: RouterState[] = [{x: 110, y: 110}];
+let routers: RouterState[] = [{
+	x: 110,
+	y: 110, amplitude:
+	defaultAmplitude,
+	omega: defaultOmega,
+	frequency: defaultFrequency,
+	selectedFrequency: defaultFrequency,
+	selectedAmplitude: defaultAmplitude,
+}];
 
 let files: FileList;
 
@@ -68,16 +84,12 @@ const toggleSimulation = () => {
 	stop = !stop;
 }
 
-let selectedFrequency = frequency;
-
-const processFrequency = () => {
-	frequency = selectedFrequency;
+const processFrequency = (index: number) => {
+	routers[index].frequency = routers[index].selectedFrequency;
 }
 
-let selectedAmplitude = amplitude;
-
-const processAmplitude = () => {
-	amplitude = selectedAmplitude;
+const processAmplitude = (index: number) => {
+	routers[index].amplitude = routers[index].selectedAmplitude;
 }
 
 let selectedDamping = damping;
@@ -91,63 +103,58 @@ const sketch: Sketch = (p5) => {
 	
 	const step = () => {
 		// Edge absorbing layer - left
-		for (let x = 1; x < a_l; ++x) {
+		for (let x = 1; x < a_l + 1; ++x) {
 			for (let y = 1; y < L - 1 + a_v; ++y) {
 				u_next[x][y] = u[x - 1][y] - 2 * u[x][y] + u[x + 1][y];
 				u_next[x][y] += u[x][y - 1] - 2 * u[x][y] + u[x][y + 1];
 				u_next[x][y] *= c;
 				u_next[x][y] += -u_prev[x][y] + 2 * u[x][y];
-				u_next[x][y] -= (a_l / x) * damping * dt * (u[x][y] - u_prev[x][y]);
+				u_next[x][y] -= (a_l / x) * absorption * dt * (u[x][y] - u_prev[x][y]);
 
 			}
 		}
 
 		// Edge absorbing layer - right
-		for (let x = L + a_l; x < L - 1 + a_h; ++x) {
+		for (let x = L - 1 + a_l; x < L - 1 + a_h; ++x) {
 			for (let y = 1; y < L - 1 + a_v; ++y) {
 				u_next[x][y] = u[x - 1][y] - 2 * u[x][y] + u[x + 1][y];
 				u_next[x][y] += u[x][y - 1] - 2 * u[x][y] + u[x][y + 1];
 				u_next[x][y] *= c;
 				u_next[x][y] += -u_prev[x][y] + 2 * u[x][y];
-				u_next[x][y] -= (a_r / (a_h - x + L - 1)) * damping * dt * (u[x][y] - u_prev[x][y]);
+				u_next[x][y] -= (a_r / (a_h - x + L)) * absorption * dt * (u[x][y] - u_prev[x][y]);
 			}
 		}
 
 		// Edge absorbing layer - top
-		for (let x = a_l; x < L + a_l - 1; ++x) {
-			for (let y = 1; y < a_t; ++y) {
+		for (let x = a_l; x < L + a_l; ++x) {
+			for (let y = 1; y < a_t + 1; ++y) {
 				u_next[x][y] = u[x - 1][y] - 2 * u[x][y] + u[x + 1][y];
 				u_next[x][y] += u[x][y - 1] - 2 * u[x][y] + u[x][y + 1];
 				u_next[x][y] *= c;
 				u_next[x][y] += -u_prev[x][y] + 2 * u[x][y];
-				u_next[x][y] -= (a_t / y) * damping * dt * (u[x][y] - u_prev[x][y]);
+				u_next[x][y] -= (a_t / y) * absorption * dt * (u[x][y] - u_prev[x][y]);
 			}
 		}
 
 		// Edge absorbing layer - bottom
-		for (let x = a_l; x < L + a_l - 1; ++x) {
-			for (let y = L + a_t; y < L - 1 + a_v; ++y) {
+		for (let x = a_l; x < L + a_l; ++x) {
+			for (let y = L - 1 + a_t; y < L - 1 + a_v; ++y) {
 				u_next[x][y] = u[x - 1][y] - 2 * u[x][y] + u[x + 1][y];
 				u_next[x][y] += u[x][y - 1] - 2 * u[x][y] + u[x][y + 1];
 				u_next[x][y] *= c;
 				u_next[x][y] += -u_prev[x][y] + 2 * u[x][y];
-				u_next[x][y] -= (a_b / (a_h - y + L - 1)) * damping * dt * (u[x][y] - u_prev[x][y]);
+				u_next[x][y] -= (a_b / (a_h - y + L)) * absorption * dt * (u[x][y] - u_prev[x][y]);
 			}
 		}
 
 		// moving by dt
-		for (let x = a_l; x < L + a_l; ++x) {
-			for (let y = a_t; y < L + a_t; ++y) {
+		for (let x = a_l + 1; x < L - 1 + a_l; ++x) {
+			for (let y = a_t + 1; y < L - 1 + a_t; ++y) {
 				u_next[x][y] = u[x - 1][y] - 2 * u[x][y] + u[x + 1][y];
 				u_next[x][y] += u[x][y - 1] - 2 * u[x][y] + u[x][y + 1];
 				u_next[x][y] *= c;
-
 				u_next[x][y] += -u_prev[x][y] + 2 * u[x][y];
-
-				if (x > a_l && x < L - 1 + a_l && y > a_t && y < L - 1 + a_t) {
-					u_next[x][y] *= walls[x - a_l][y - a_t];
-				}
-
+				u_next[x][y] *= walls[x - a_l][y - a_t];
 				u_next[x][y] -= damping * dt * (u[x][y] - u_prev[x][y]);
 			}
 		}
@@ -240,16 +247,26 @@ const sketch: Sketch = (p5) => {
 					// Disable context menu - this might be blocked in some browsers
 					preventContextMenu();
 				} finally {
-					// Remove router from the list
-					routers.forEach((_, routerIndex) => {
-						if (routerIndex === currentRouterIndex) {
-							routers.splice(routerIndex, 1);
-						}
+					// Remove router from the list (must be an assignment, so no splice)
+					routers = routers.filter((_, routerIndex) => {
+						return routerIndex !== currentRouterIndex;
 					});
 				}
 			}
 		} else if (p5.mouseButton == p5.LEFT && mouseInCanvas(p5.mouseX, p5.mouseY)) {
-			routers.push({x: p5.round(p5.mouseX / pixelSize), y: p5.round(p5.mouseY / pixelSize)});
+			// Update is such a way, that UI sees it (not just push)
+			routers = [
+				...routers,
+				{
+					x: p5.round(p5.mouseX / pixelSize),
+					y: p5.round(p5.mouseY / pixelSize),
+					amplitude: defaultAmplitude,
+					omega: defaultOmega,
+					frequency:defaultFrequency,
+					selectedAmplitude: defaultAmplitude,
+					selectedFrequency:defaultFrequency,
+				}
+			];
 		}
 	}
 
@@ -293,7 +310,7 @@ const sketch: Sketch = (p5) => {
 			}
 			
 			if (!stop && !(dragging && routerIndex === currentRouterIndex)) {
-				u[routerState.x + a_l][routerState.y + a_t] = amplitude * p5.sin(frequency * omega * t);
+				u[routerState.x + a_l][routerState.y + a_t] = routerState.amplitude * p5.sin(routerState.frequency * routerState.omega * t);
 			}
 		});
 
@@ -353,55 +370,84 @@ const sketch: Sketch = (p5) => {
 <style>
 .buttons {
 	margin-bottom: 10px; /* Adjust the desired gap size here */
+	margin-left: 10px; /* Adjust the desired gap size here */
+}
+
+.row {
+  display: flex;
+}
+
+.column {
+  flex: 50%;
 }
 </style>
+<div class="row">
+	<div class="column">
+		<P5 {sketch} />
 
-<P5 {sketch} />
+		<br class="buttons">
 
-<br class="buttons">
+		<label>
+			Ustaw obraz planszy:
+			<input type="file" bind:files on:change={onFileChange} accept="image/png, image/jpeg" />
+		</label>
 
-<label>
-	Ustaw obraz planszy:
-	<input type="file" bind:files on:change={onFileChange} accept="image/png, image/jpeg" />
-</label>
+		<br class="buttons">
 
-<br class="buttons">
+		<div class="buttons">
+			<button on:click={onClean}>Wyczyść</button>
+		</div>
 
-<div class="buttons">
-<button on:click={onClean}>Wyczyść</button>
+		<div class="buttons">
+			<button on:click={toggleSimulation}>
+			{#if stop}
+				Wznów symulację
+			{:else}
+				Zatrzymaj symulację
+			{/if}
+			</button>
+		</div>
+
+		<label>
+			Współczynnik tłumienia w ośrodku:
+			<input bind:value={selectedDamping} type="range" min="0" max="2" step="0.01">
+			<input bind:value={selectedDamping} type="number" step="0.1">
+			<button on:click={processDamping}>Zmień</button>
+		</label>
+
+		<br class="buttons">
+
+		<div>
+			<h1>
+				Symulacja propagacji sygnału Wifi
+			</h1>
+			<p>
+				{"{"}
+				Więcej informacji
+				{"}"}
+			</p>
+		</div>
+	</div>
+
+	<div class="column">
+		{#each routers as routerState, rIdx}
+		<Item entry={`Router ${rIdx}`}>
+			<label>
+				Wartość częstotliwości
+				<input bind:value={routerState.selectedFrequency} type="range" min="0" max="5" step="0.01">
+				<input bind:value={routerState.selectedFrequency} type="number" step="0.1">
+				<button on:click={() => processFrequency(rIdx)}>Zmień</button>
+			</label>
+			
+			<br class="buttons">
+			
+			<label>
+				Wartość amplitudy
+				<input bind:value={routerState.selectedAmplitude} type="range" min="0" max="500" step="0.1">
+				<input bind:value={routerState.selectedAmplitude} type="number">
+				<button on:click={() => processAmplitude(rIdx)}>Zmień</button>
+			</label>
+		</Item>
+		{/each}
+	</div>
 </div>
-
-<div class="buttons">
-	<button on:click={toggleSimulation}>
-	{#if stop}
-		Wznów symulację
-	{:else}
-		Zatrzymaj symulację
-	{/if}
-	</button>
-</div>
-
-<label>
-	Wartość częstotliwości
-	<input bind:value={selectedFrequency} type="range" min="0" max="5" step="0.01">
-	<input bind:value={selectedFrequency} type="number" step="0.1">
-	<button on:click={processFrequency}>Zmień</button>
-</label>
-
-<br class="buttons">
-
-<label>
-	Wartość amplitudy
-	<input bind:value={selectedAmplitude} type="range" min="0" max="500" step="0.1">
-	<input bind:value={selectedAmplitude} type="number">
-	<button on:click={processAmplitude}>Zmień</button>
-</label>
-
-<br class="buttons">
-
-<label>
-	Współczynnik tłumienia w ośrodku
-	<input bind:value={selectedDamping} type="range" min="0" max="2" step="0.01">
-	<input bind:value={selectedDamping} type="number" step="0.1">
-	<button on:click={processDamping}>Zmień</button>
-</label>
