@@ -5,7 +5,7 @@
 
 ## Dependencies
 
-* [pnpm](https://pnpm.io/installation) - package manager usd for this project
+* [pnpm](https://pnpm.io/installation) - package manager used for this project
 
 ## Used technologies
 
