@@ -422,20 +422,17 @@ const sketch: Sketch = (p5) => {
 				Symulacja propagacji sygnału Wifi
 			</h1>
 			<h2>
-				Dokumnetacja
+				Dokumentacja
 			</h2>
 			<p>
 				- Kliknięcie lewym przyciskiem myszy w pusty obszar na symulacji – dodanie nowego routera, <br>
-				- Kliknięcie lewym przyciskiem myszy i przesunięcie istniejącego routera – zmienienie położenia routera, <br>
+				- Kliknięcie lewym przyciskiem myszy i przesunięcie istniejącego routera – zmiana położenia routera, <br>
 				- Kliknięcie prawym przyciskiem myszy w istniejącego routera – usunięcie routera, <br>
-				- Dla każdego istniejącego routera można zmieniać częstotliwość w jakiej nadaje oraz amplitudę fali w panelu po prawej stronie, <br>
+				- Dla każdego istniejącego routera można zmieniać częstotliwość w jakiej nadaje sygnał oraz amplitudę fali w panelu po prawej stronie, <br>
 				- W panelu po lewej stronie istnieje możliwość wyczyszczenia obrazu z istniejących na nim fal oraz możliwość zatrzymania symulacji, <br>
 				- Istnieje możliwość wczytania własnego pliku .png o wymiarach 201x201, <br>
 				- Istnieje możliwość zmiany współczynnika tłumienia w ośrodku, <br>
-				- Współczynnik tłumienia na obrazie jest wymierzany według składowej luminacji w modelu YCbCr,
-				więc kolor biały nie powoduje tłumienia, a kolor czarny powoduje całkowity zanik sygnału.
-				Współczynnik tłumienia = luminacja/255. W przypadku gdy przeszkoda ma więcej niż 1 pixel grubości (Współczynnik tłumienia)**ilość pixeli,  <br>
-				- na domyślnie wgranym obrazie obraz obrazach przykładowych znajduję się wiele odcieni szarośći imitujących różne przeszkody posiadające rózne współczynniki tłumienia,  <br>
+				- Współczynnik tłumienia na obrazie jest wymierzany według składowej luminacji w modelu YCbCr. <br>
 			</p>
 		</div>
 	</div>
