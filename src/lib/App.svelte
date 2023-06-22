@@ -287,7 +287,7 @@ const sketch: Sketch = (p5) => {
 
 	p5.setup = () => {
 		canvas = p5.createCanvas(L * pixelSize , L * pixelSize);
-
+		p5.pixelDensity(1);
 		makeWalls();
 		makeWallsFromImg(img!);
 		clean();
